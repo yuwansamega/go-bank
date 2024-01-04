@@ -3,14 +3,21 @@ package main
 import (
 	"crypto/rand"
 	"math/big"
+	"time"
 )
 
+type CreateAccountRequest struct {
+	FirstName string `json:"firstName`
+	LastName  string `json:"lastName`
+}
+
 type Account struct {
-	ID        int    `json:"id"`
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
-	Number    int64  `json:"number"`
-	Balance   int64  `json:"balance"`
+	ID        int       `json:"id"`
+	FirstName string    `json:"firstName"`
+	LastName  string    `json:"lastName"`
+	Number    int64     `json:"number"`
+	Balance   int64     `json:"balance"`
+	CreatedAt time.Time `json:"createdAt`
 }
 
 func NewAccount(firstName, lastName string) *Account {
@@ -26,5 +33,6 @@ func NewAccount(firstName, lastName string) *Account {
 		FirstName: firstName,
 		LastName:  lastName,
 		Number:    number.Int64(),
+		CreatedAt: time.Now().UTC(),
 	}
 }
