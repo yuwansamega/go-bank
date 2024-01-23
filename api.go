@@ -51,7 +51,28 @@ func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	return WriteJSON(w, http.StatusOK, req)
+	acc, err := s.store.GetAccountByNumber(int(req.Number))
+	if err != nil {
+		return err
+	}
+
+	token, err := createJWT(acc)
+	if err != nil {
+		return err
+	}
+
+	resp := LoginResponse{
+		Token:  token,
+		Number: acc.Number,
+	}
+
+	if !acc.ValidatePassword(req.Password) {
+		return fmt.Errorf("User atau Password salah")
+	}
+
+	fmt.Printf("%+v\n", acc)
+
+	return WriteJSON(w, http.StatusOK, resp)
 }
 
 func (s *APIServer) handleAccount(w http.ResponseWriter, r *http.Request) error {
@@ -209,7 +230,7 @@ func WithJWtAuth(handlerFunc http.HandlerFunc, s Storage) http.HandlerFunc {
 	}
 }
 
-//eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50TnVtYmVyIjozMTk0ODUwLCJleHBpcmVzQXQiOjE1MDAwfQ.RVzl0JB2muZG5cDDTtK6Z68h2qw_GGAyACdDMX9uySc
+//
 
 func validateJWT(tokenString string) (*jwt.Token, error) {
 
